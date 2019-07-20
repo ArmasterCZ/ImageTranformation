@@ -1,0 +1,26 @@
+﻿<Window x:Class="ImageTranformation.View.ImageTransformationView"
+        xmlns:dd="urn:gong-wpf-dragdrop"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ImageTranformation.View"
+        mc:Ignorable="d"
+        Title="Image transformation" Height="297.201" Width="287.873">
+    <Grid Margin="0,0,2,0">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Button x:Uid="bTransform" Command="{Binding BTransformClick}" Content="Transform" Margin="10,0,10,10" Height="35" VerticalAlignment="Bottom" />
+        <ComboBox x:Uid="cbOutputExtension" ItemsSource="{Binding CbOutputExtensionSource, Mode=TwoWay}" SelectedItem="{Binding CbOutputExtensionSelected, Mode=TwoWay}" Margin="10,86,10,0" VerticalAlignment="Top" Height="32"/>
+        <TextBox x:Uid="tbPath" Text="{Binding TbPathText, Mode=TwoWay}" Margin="10,14,10,0" TextWrapping="Wrap"
+         dd:DragDrop.IsDragSource="True"
+         dd:DragDrop.IsDropTarget="True"
+         dd:DragDrop.DropHandler="{Binding}" Height="67" VerticalAlignment="Top"/>
+        <Image x:Uid="iPreview" Source="{Binding IPreviewSource}" Margin="10,123,123,50"
+         dd:DragDrop.IsDragSource="True"
+         dd:DragDrop.IsDropTarget="True"
+         dd:DragDrop.DropHandler="{Binding}"/>
+
+    </Grid>
+</Window>

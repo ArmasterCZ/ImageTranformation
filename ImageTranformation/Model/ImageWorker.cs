@@ -12,33 +12,23 @@ namespace ChalengeImageTransformationAdvanced
 {
     class ImageWorker
     {
-        private string inputImagePath;
-        private string outputFileExtension;
+        #region prop
+
+        private string InputImagePath { get; set; }
+
+        public string OutputFileExtension { get; set; }
+
+        public ImageFormat OutputImageFormat { get; set; }
+
+        public bool allowDeleteExistOutputFile { get; set; } = false;
+
+        public EventHandler<string> returnMessage;
 
         private string inputFileExtension;
         private string outputImagePath;
-        private ImageFormat outputImageFormat;
         private Bitmap picture;
-        //private Dictionary<string, ImageFormat>
 
-        #region getersSeters
-        
-        public string OutputFileExtension
-        {
-            get { return outputFileExtension; }
-            set {
-                outputFileExtension = value;
-                outputImageFormat = AllovedExtensions.allovedExtensions[value];
-            }
-        }
-
-        public string InputImagePath
-        {
-            get { return inputImagePath; }
-            set { inputImagePath = value; }
-        }
-
-        #endregion getersSeters
+        #endregion prop
 
         public ImageWorker(string imagePath)
         {
@@ -50,155 +40,109 @@ namespace ChalengeImageTransformationAdvanced
             InputImagePath = imagePath;
             OutputFileExtension = outputFileExtension;
         }
+
+        public ImageWorker(string imagePath, string outputFileExtension, ImageFormat OutputImageFormat)
+        {
+            InputImagePath = imagePath;
+            OutputFileExtension = outputFileExtension;
+            this.OutputImageFormat = OutputImageFormat;
+        }
+
         public ImageWorker(ImageWorker imageWorker)
         {
-            InputImagePath = imageWorker.inputImagePath;
+            InputImagePath = imageWorker.InputImagePath;
+        }
+
+        /// <summary>
+        /// process that save image
+        /// </summary>
+        public void processImage()
+        {
+            loadFileInfo();
+
+            bool allowImageSave = checkConditions();
+            
+            if (allowImageSave)
+            {
+                saveImage();
+            }
+            else
+            {
+                returnMessage?.Invoke(this, $"Operation canceled.");
+            }
+        }
+
+        /// <summary>
+        /// load file extension and create output path
+        /// </summary>
+        private void loadFileInfo()
+        {
+            //extension of input image
+            inputFileExtension = System.IO.Path.GetExtension(InputImagePath).Substring(1).ToLower();
+            //extension of output image
+            OutputFileExtension = OutputFileExtension.ToLower();
+            //path for created image
+            outputImagePath = System.IO.Path.ChangeExtension(InputImagePath, $".{OutputFileExtension}");
         }
 
         /// <summary>
         /// check conditions for image save
         /// </summary>
-        public void processImage()
+        private bool checkConditions()
         {
-            //extension of input image
-            inputFileExtension = System.IO.Path.GetExtension(inputImagePath).Substring(1).ToLower();
-            //extension of output image
-            outputFileExtension = outputFileExtension.ToLower();
-            //path for created image
-            outputImagePath = System.IO.Path.ChangeExtension(inputImagePath, $".{outputFileExtension}");
-
-            //check conditions
-            bool allowImageSave = resultSameType(inputFileExtension, outputFileExtension, outputImagePath);
-            if (allowImageSave)
+            //result same type
+            bool allowImageSave = true;
+            if (inputFileExtension.Equals(OutputFileExtension))
             {
-                allowImageSave = resultExistingFile(outputImagePath);
+                returnMessage?.Invoke(this, $"Cannot convert to same type. {inputFileExtension} to {OutputFileExtension}");
+                allowImageSave = false;
             }
 
-            //save
+            //result existing file
             if (allowImageSave)
             {
-                saveImage(outputFileExtension, outputImagePath);
+                if (File.Exists(outputImagePath))
+                {
+                    if (allowDeleteExistOutputFile)
+                    {
+                        File.Delete(outputImagePath);
+                        allowImageSave = true;
+                    }
+                    else
+                    {
+                        allowImageSave = false;
+                    }
+                }
+                else
+                {
+                    allowImageSave = true;
+                }
+                
             }
-            else
-            {
-                MessageBox.Show($"Operation canceled.", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
-            }
+            return allowImageSave;
         }
-
 
         /// <summary>
         /// save image
         /// </summary>
-        private void saveImage(string outputType, string newFilePath)
+        private void saveImage()
         {
             try
             {
                 //load image
-                picture = new Bitmap(inputImagePath);
+                picture = new Bitmap(InputImagePath);
                 //get extension format
-                outputImageFormat = AllovedExtensions.allovedExtensions[outputType];
+                OutputImageFormat = AllovedExtensions.allovedExtensions[OutputFileExtension];
 
                 //save image
-                picture.Save(newFilePath, outputImageFormat);
+                picture.Save(outputImagePath, OutputImageFormat);
 
-                MessageBox.Show($"Image Converted to {outputType}", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
+                returnMessage?.Invoke(this, $"Image Converted to {OutputFileExtension}");
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Image Convertion failed. Reasons: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                returnMessage?.Invoke(this, $"Image Convertion failed. Reasons: {ex.Message}");
             }
-
-        }
-
-
-        /// <summary>
-        /// load image
-        /// </summary>
-        private Bitmap getPicture(string currentPath, int height = 0, int width = 0)
-        {
-            System.Drawing.Image imgSize = System.Drawing.Image.FromFile(currentPath);
-
-            if (height < 0)
-            {
-                height = imgSize.Height;
-            }
-
-            if (width < 0)
-            {
-                width = imgSize.Width;
-            }
-
-            System.Drawing.Size size = new System.Drawing.Size(width, height);
-            System.Drawing.Image image = System.Drawing.Image.FromFile(currentPath);
-            Bitmap picture = new Bitmap(image, size);
-            return picture;
-
-            //var y = picture.Size.Height;
-            //var x = picture.Size.Width;
-            //picture.SetResolution(x, y);
-        }
-
-        /// <summary>
-        /// check if file from path exist
-        /// </summary>
-        private bool validatePath(string path)
-        {
-            bool fileExist = File.Exists(path);
-            return fileExist;
-        }
-
-        private bool checkConditions(string inputType, string outputType, string newFilePath)
-        {
-            //resultSameType
-            if (inputType.Equals(outputType))
-            {
-                MessageBoxResult result = MessageBox.Show($"Cannot convert to same type. {inputType} to {outputType}", "Info", MessageBoxButton.OK, MessageBoxImage.Stop);
-                return false;
-            }
-
-            //resultExistingFile
-            if (File.Exists(newFilePath))
-            {
-                MessageBoxResult result = MessageBox.Show($"Do you want replace orginal image?", "Confirm", MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
-                if (result == MessageBoxResult.Yes)
-                {
-                    File.Delete(newFilePath);
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-            return true;
-        }
-
-        private bool resultSameType(string inputType, string outputType, string newFilePath)
-        {
-            if (inputType.Equals(outputType))
-            {
-                MessageBoxResult result = MessageBox.Show($"Cannot convert to same type. {inputType} to {outputType}", "Info", MessageBoxButton.OK, MessageBoxImage.Stop);
-                return false;
-            }
-            return true;
-        }
-
-        private bool resultExistingFile(string newFilePath)
-        {
-            if (File.Exists(newFilePath))
-            {
-                MessageBoxResult result = MessageBox.Show($"Do you want replace orginal image?", "Confirm", MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
-                if (result == MessageBoxResult.Yes)
-                {
-                    File.Delete(newFilePath);
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-            return true;
         }
     }
 }

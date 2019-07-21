@@ -57,6 +57,9 @@ namespace ImageTranformation.ViewModel
 
         #endregion prop
 
+        /// <summary>
+        /// constructor setup button event, comboBox and image
+        /// </summary>
         public ImageTransformationViewModel()
         {
             BTransformClick = new DelegateCommand(BTransform_Click, BTransform_IsEnabled).ObservesProperty(() => TbPathText);
@@ -90,8 +93,10 @@ namespace ImageTranformation.ViewModel
         /// </summary>
         private void BTransform_Click()
         {
-            TbPathText = @"D:\Armaster\Downloads\imageChalange\orginalPng.png";
             ImageWorker imageWorker = new ImageWorker(TbPathText, CbOutputExtensionSelected);
+            imageWorker.OutputImageFormat = AllovedExtensions.allovedExtensions[CbOutputExtensionSelected];
+            imageWorker.allowDeleteExistOutputFile = true;
+            imageWorker.returnMessage += displayMessage;
             imageWorker.processImage();
         }
 
@@ -138,5 +143,12 @@ namespace ImageTranformation.ViewModel
             }
         }
 
+        /// <summary>
+        /// display message box for event
+        /// </summary>
+        private void displayMessage(object sender, string message)
+        {
+            MessageBox.Show(message, "Message", MessageBoxButton.OK);
+        }
     }
 }

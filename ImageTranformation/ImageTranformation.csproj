@@ -72,7 +72,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Model\AllovedExtensions.cs" />
+    <Compile Include="Model\PictureExtensions.cs" />
     <Compile Include="Model\ImageWorker.cs" />
     <Compile Include="ViewModel\ImageTransformationViewModel.cs" />
     <Compile Include="View\ImageTransformationView.xaml.cs">
@@ -114,6 +114,8 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <WCFMetadata Include="Connected Services\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

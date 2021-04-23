@@ -20,9 +20,9 @@ namespace ChalengeImageTransformationAdvanced
 
         public ImageFormat OutputImageFormat { get; set; }
 
-        public bool allowDeleteExistOutputFile { get; set; } = false;
+        public bool AllowDeleteExistOutputFile { get; set; } = false;
 
-        public EventHandler<string> returnMessage;
+        public EventHandler<string> ReturnMessage;
 
         private string inputFileExtension;
         private string outputImagePath;
@@ -56,26 +56,26 @@ namespace ChalengeImageTransformationAdvanced
         /// <summary>
         /// process that save image
         /// </summary>
-        public void processImage()
+        public void ProcessImage()
         {
-            loadFileInfo();
+            LoadFileInfo();
 
-            bool allowImageSave = checkConditions();
+            bool allowImageSave = CheckConditions();
             
             if (allowImageSave)
             {
-                saveImage();
+                SaveImage();
             }
             else
             {
-                returnMessage?.Invoke(this, $"Operation canceled.");
+                ReturnMessage?.Invoke(this, $"Operation canceled.");
             }
         }
 
         /// <summary>
         /// load file extension and create output path
         /// </summary>
-        private void loadFileInfo()
+        private void LoadFileInfo()
         {
             //extension of input image
             inputFileExtension = System.IO.Path.GetExtension(InputImagePath).Substring(1).ToLower();
@@ -88,13 +88,13 @@ namespace ChalengeImageTransformationAdvanced
         /// <summary>
         /// check conditions for image save
         /// </summary>
-        private bool checkConditions()
+        private bool CheckConditions()
         {
             //result same type
             bool allowImageSave = true;
             if (inputFileExtension.Equals(OutputFileExtension))
             {
-                returnMessage?.Invoke(this, $"Cannot convert to same type. {inputFileExtension} to {OutputFileExtension}");
+                ReturnMessage?.Invoke(this, $"Cannot convert to same type. {inputFileExtension} to {OutputFileExtension}");
                 allowImageSave = false;
             }
 
@@ -103,7 +103,7 @@ namespace ChalengeImageTransformationAdvanced
             {
                 if (File.Exists(outputImagePath))
                 {
-                    if (allowDeleteExistOutputFile)
+                    if (AllowDeleteExistOutputFile)
                     {
                         File.Delete(outputImagePath);
                         allowImageSave = true;
@@ -125,23 +125,23 @@ namespace ChalengeImageTransformationAdvanced
         /// <summary>
         /// save image
         /// </summary>
-        private void saveImage()
+        private void SaveImage()
         {
             try
             {
                 //load image
                 picture = new Bitmap(InputImagePath);
                 //get extension format
-                OutputImageFormat = AllovedExtensions.allovedExtensions[OutputFileExtension];
+                OutputImageFormat = (new PictureExtensions()).AllovedExtensions[OutputFileExtension];
 
                 //save image
                 picture.Save(outputImagePath, OutputImageFormat);
 
-                returnMessage?.Invoke(this, $"Image Converted to {OutputFileExtension}");
+                ReturnMessage?.Invoke(this, $"Image Converted to {OutputFileExtension}");
             }
             catch (Exception ex)
             {
-                returnMessage?.Invoke(this, $"Image Convertion failed. Reasons: {ex.Message}");
+                ReturnMessage?.Invoke(this, $"Image Convertion failed. Reasons: {ex.Message}");
             }
         }
     }

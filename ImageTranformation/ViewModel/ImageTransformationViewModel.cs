@@ -25,7 +25,7 @@ namespace ImageTranformation.ViewModel
         {
             get { return tbPathText; }
             set { SetProperty(ref tbPathText, value);
-                loadImage();
+                LoadImage();
             }
         }
 
@@ -63,8 +63,8 @@ namespace ImageTranformation.ViewModel
         public ImageTransformationViewModel()
         {
             BTransformClick = new DelegateCommand(BTransform_Click, BTransform_IsEnabled).ObservesProperty(() => TbPathText);
-            setupComboBox();
-            loadImage();
+            SetupComboBox();
+            LoadImage();
         }
 
         /// <summary>
@@ -94,10 +94,10 @@ namespace ImageTranformation.ViewModel
         private void BTransform_Click()
         {
             ImageWorker imageWorker = new ImageWorker(TbPathText, CbOutputExtensionSelected);
-            imageWorker.OutputImageFormat = AllovedExtensions.allovedExtensions[CbOutputExtensionSelected];
-            imageWorker.allowDeleteExistOutputFile = true;
-            imageWorker.returnMessage += displayMessage;
-            imageWorker.processImage();
+            imageWorker.OutputImageFormat = (new PictureExtensions()).AllovedExtensions[CbOutputExtensionSelected];
+            imageWorker.AllowDeleteExistOutputFile = true;
+            imageWorker.ReturnMessage += DisplayMessage;
+            imageWorker.ProcessImage();
         }
 
         /// <summary>
@@ -111,7 +111,7 @@ namespace ImageTranformation.ViewModel
         /// <summary>
         /// load image to <see cref="IPreviewSource"/>
         /// </summary>
-        private void loadImage()
+        private void LoadImage()
         {
             string imagePath = TbPathText;
             if (File.Exists(imagePath))
@@ -134,9 +134,9 @@ namespace ImageTranformation.ViewModel
         /// <summary>
         /// setup combo box <see cref="CbOutputExtensionSource"/>
         /// </summary>
-        private void setupComboBox()
+        private void SetupComboBox()
         {
-            CbOutputExtensionSource = AllovedExtensions.getAllowedExtensions();
+            CbOutputExtensionSource = (new PictureExtensions()).GetAllowedExtensions();
             if (CbOutputExtensionSource.Count > 0)
             {
                 CbOutputExtensionSelected = CbOutputExtensionSource[0].ToString();
@@ -146,7 +146,7 @@ namespace ImageTranformation.ViewModel
         /// <summary>
         /// display message box for event
         /// </summary>
-        private void displayMessage(object sender, string message)
+        private void DisplayMessage(object sender, string message)
         {
             MessageBox.Show(message, "Message", MessageBoxButton.OK);
         }

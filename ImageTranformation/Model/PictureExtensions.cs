@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 
 namespace ChalengeImageTransformationAdvanced
 {
-    class AllovedExtensions
+    class PictureExtensions
     {
         /// <summary>
         /// dictionary of allowed extensions and image format
         /// </summary>
-        public static Dictionary<string, ImageFormat> allovedExtensions = new Dictionary<string, ImageFormat>() {
+        public Dictionary<string, ImageFormat> AllovedExtensions = new Dictionary<string, ImageFormat>() {
              {"jpg", ImageFormat.Jpeg},
              {"bmp", ImageFormat.Bmp},
              {"gif", ImageFormat.Gif},
@@ -22,16 +22,9 @@ namespace ChalengeImageTransformationAdvanced
         /// <summary>
         /// return list<string> extensions
         /// </summary>
-        public static List<string> getAllowedExtensions()
+        public List<string> GetAllowedExtensions()
         {
-            List<string> extension = new List<string>();
-
-            foreach (var item in allovedExtensions)
-            {
-                extension.Add(item.Key);
-            }
-
-            return extension;
+            return AllovedExtensions.Keys.ToList();
         }
     }
 }
